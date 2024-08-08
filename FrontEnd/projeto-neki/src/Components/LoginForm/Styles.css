@@ -61,8 +61,9 @@ padding: 20px 45px 20px 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, .1);
     cursor: pointer;
     font-size: 16px;
-    color: #333;
     font-weight: 700;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .wrapper button:hover, .wrapper button:focus{
@@ -84,3 +85,55 @@ padding: 20px 45px 20px 20px;
 .register-link p a:hover{
     text-decoration: underline;
 }
+
+.Link{
+    text-decoration: none;
+    color: #fff;
+}
+
+
+.skillset {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+  }
+  
+  .skill {
+    flex: 1 1 calc(50% - 20px);
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .description {
+    font-size: 14px; /* Define o tamanho da fonte para a descrição */
+    /* color: #555;     Define a cor do texto da descrição */
+  }
+  
+  .skill img {
+    max-width: 100px;
+    height: auto;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  

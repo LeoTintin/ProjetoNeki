@@ -5,7 +5,6 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
-
 export const CadastroForm = () => {
     const [open, setOpen] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
@@ -69,7 +68,7 @@ export const CadastroForm = () => {
                         Visualizar senha
                     </label>
                 </div>
-                <Button variant="contained" type="submit">Entrar</Button>
+                <Button variant="contained" type="submit"><Link className='Link' to="/home">ENTRAR</Link></Button>
 
                 {/* Modal para mensagem de sucesso */}
                 <Modal

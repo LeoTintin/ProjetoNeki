@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './LoginForm.css';
+import './Styles.css';
 import { FaUser, FaLock } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
@@ -37,7 +37,7 @@ export const LoginForm = () => {
             Mostrar Senha
           </label>
         </div>
-        <button type='submit'>ENTRAR</button>
+        <button type='submit'><Link className='Link' to="/home">ENTRAR</Link></button>
         <div className="register-link">
           <p>Não possui conta? <Link to="/cadastro">Cadastre-se</Link></p>
         </div>
