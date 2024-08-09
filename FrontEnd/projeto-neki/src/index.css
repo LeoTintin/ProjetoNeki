@@ -14,8 +14,10 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  /* background: rgb(2,0,36); */
-background: linear-gradient(220deg, #ee0dfb 20%,#8d5ff2 45%, #30b0e3 75%);
+  background: url('./Components/assets/Space.png') no-repeat;
+  background-size: cover;
+  background-position: center;
+
 }
 
 code {

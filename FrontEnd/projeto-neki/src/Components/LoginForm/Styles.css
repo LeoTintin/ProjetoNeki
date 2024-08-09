@@ -1,6 +1,8 @@
 .wrapper{
     width: 420px;
-    background-color: #fff;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(3px);
     border-radius: 10px;
     padding: 30px 40px;
 }
@@ -8,6 +10,7 @@
 .wrapper h1{
     font-size: 36px;
     text-align: center;
+    color: #fff;
 }
 
 .wrapper .input-box{
@@ -25,7 +28,7 @@ border: 2px solid rgba(255, 255, 255, .2);
 outline: none;
 border-radius: 40px;
 font-size: 16px;
-color: #000;
+color: #fff;
 padding: 20px 45px 20px 20px;
 }
 .input-box .icon{
@@ -34,6 +37,7 @@ padding: 20px 45px 20px 20px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 16px;
+    color: #fff;
 }
 
 .wrapper .remember{
@@ -41,6 +45,7 @@ padding: 20px 45px 20px 20px;
     justify-content: space-between;
     font-size:14px;
     margin: -15px 0 15px;
+    color: #fff;
 }
 
 .wrapper .remember label input{
@@ -50,11 +55,10 @@ padding: 20px 45px 20px 20px;
 .wrapper button{
     width: 100%;
     height: 45px;
-    background: linear-gradient(300deg, #ee0dfb 35%, #30b0e3 100%);
+    background: linear-gradient(300deg, #2d384e 35%, #fff 100%);
     background-size:300% ;
     background-position: left;
     transition: background-position 0.5s;
-    color: #fff;
     border: none;
     outline: none;
     border-radius: 40px;
@@ -70,16 +74,30 @@ padding: 20px 45px 20px 20px;
     background-position: right;
     color: #fff;
 }
-
+.wrapper button a{
+    color: #000;
+}
+.wrapper button a:hover,.wrapper button a:focus{
+    color: #fff;
+}
 .wrapper .register-link{
     font-size: 14px;
     text-align: center;
     margin: 20px 0 15px;
+    
+}
+
+.register-link p{
+    text-decoration: none;
+    font-weight: 600;
+    color: #fff;
 }
 
 .register-link p a{
-    text-decoration: none;
+    /* text-decoration: none; */
     font-weight: 600;
+    color: #fff;
+   
 }
 
 .register-link p a:hover{
@@ -97,6 +115,7 @@ padding: 20px 45px 20px 20px;
     flex-wrap: wrap;
     gap: 20px;
     justify-content: space-between;
+    
   }
   
   .skill {
@@ -106,6 +125,8 @@ padding: 20px 45px 20px 20px;
     padding: 10px;
     border-radius: 8px;
     text-align: center;
+    background-color: rgba(255, 255, 255, .2);
+    backdrop-filter: blur(30px);
   }
   
   .description {
