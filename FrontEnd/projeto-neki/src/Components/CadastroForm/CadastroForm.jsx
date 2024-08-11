@@ -111,8 +111,7 @@ export const CadastroForm = () => {
                         Visualizar senha
                     </label>
                 </div>
-                <Button variant="contained" type="submit"><Link className='Link' to="/home">ENTRAR</Link></Button>
-
+                <button className='button' type='submit'>ENTRAR</button>
                 {/* Modal para mensagem de sucesso */}
                 <Modal
                     open={open}

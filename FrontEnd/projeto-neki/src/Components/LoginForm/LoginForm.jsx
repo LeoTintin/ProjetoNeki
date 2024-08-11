@@ -8,10 +8,11 @@ export const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Carregar as credenciais armazenadas no localStorage
     const savedLogin = localStorage.getItem('login');
     const savedPassword = localStorage.getItem('password');
 
@@ -43,16 +44,14 @@ export const LoginForm = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error('Nome de usuário ou senha incorretos');
       }
 
       const data = await response.json();
       console.log('Autenticação bem-sucedida:', data);
 
-      // Armazenar o token no localStorage, caso receba um token na resposta
       localStorage.setItem('token', data.token);
 
-      // Verificar se o checkbox "Lembre de mim" está marcado
       if (rememberMe) {
         localStorage.setItem('login', login);
         localStorage.setItem('password', password);
@@ -61,10 +60,22 @@ export const LoginForm = () => {
         localStorage.removeItem('password');
       }
 
-      // Redirecionar para a página home após o login
       navigate('/home');
     } catch (error) {
       console.error('Erro ao autenticar:', error);
+      setErrorMessage(error.message);
+      setShowErrorModal(true);
+    }
+  };
+
+  const closeModal = () => {
+    setShowErrorModal(false);
+  };
+
+  const handleModalClick = (e) => {
+    // Fecha o modal se o clique for fora do conteúdo do modal
+    if (e.target.classList.contains('modal')) {
+      closeModal();
     }
   };
 
@@ -75,7 +86,7 @@ export const LoginForm = () => {
         <div className="input-box">
           <input
             type="text"
-            placeholder='Nome de usuario'
+            placeholder='Nome de usuário'
             required
             value={login}
             onChange={(e) => setLogin(e.target.value)}
@@ -110,11 +121,21 @@ export const LoginForm = () => {
             Mostrar Senha
           </label>
         </div>
-        <button type='submit'>ENTRAR</button>
+        <button className='button' type='submit'>ENTRAR</button>
         <div className="register-link">
           <p>Não possui conta? <Link to="/cadastro">Cadastre-se</Link></p>
         </div>
       </form>
+
+      {showErrorModal && (
+        <div className="modal" onClick={handleModalClick}>
+          <div className="modal-content">
+            <h2>Erro de Autenticação</h2>
+            <p>{errorMessage}</p>
+            <button className='button2' onClick={closeModal}>Fechar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
