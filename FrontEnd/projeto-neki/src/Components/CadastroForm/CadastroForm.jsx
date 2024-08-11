@@ -5,28 +5,65 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
+
 export const CadastroForm = () => {
+    const [formData, setFormData] = useState({
+        login: '',
+        password: '',
+        confirmPassword: ''
+    });
     const [open, setOpen] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const handleErrorOpen = () => setErrorOpen(true);
     const handleErrorClose = () => setErrorOpen(false);
 
+    const handleFormEdit = (event, name) => {
+        setFormData({
+            ...formData,
+            [name]: event.target.value
+        });
+    };
+
     const handleCheckboxChange = (event) => {
         setShowPassword(event.target.checked);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        if (password !== confirmPassword) {
+        if (formData.password !== formData.confirmPassword) {
             handleErrorOpen();
         } else {
+            await handleForm();
+        }
+    };
+
+    const handleForm = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/auth/cadastro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    login: formData.login,
+                    password: formData.password,
+                    role: 'ADMIN'  // ou outro valor se necessário
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const json = response.headers.get('Content-Length') > 0 ? await response.json() : null;
+            console.log('Cadastro realizado:', json);
             handleOpen();
+        } catch (err) {
+            console.error('Erro ao realizar o cadastro:', err);
         }
     };
 
@@ -35,16 +72,22 @@ export const CadastroForm = () => {
             <form onSubmit={handleSubmit}>
                 <h1>Cadastro</h1>
                 <div className="input-box">
-                    <input type="text" placeholder='Nome de usuário' required />
+                    <input 
+                        type="text" 
+                        placeholder='Nome de usuário' 
+                        required 
+                        value={formData.login} 
+                        onChange={(e) => handleFormEdit(e, 'login')} 
+                    />
                     <FaUser className='icon' />
                 </div>
                 <div className="input-box">
                     <input
                         type={showPassword ? 'text' : 'password'}
                         placeholder='Senha'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
                         required
+                        value={formData.password}
+                        onChange={(e) => handleFormEdit(e, 'password')}
                     />
                     <FaLock className='icon' />
                 </div>
@@ -52,9 +95,9 @@ export const CadastroForm = () => {
                     <input
                         type={showPassword ? 'text' : 'password'}
                         placeholder='Insira a senha novamente'
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
                         required
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleFormEdit(e, 'confirmPassword')}
                     />
                     <FaLock className='icon' />
                 </div>
@@ -130,4 +173,4 @@ export const CadastroForm = () => {
             </form>
         </div>
     );
-}
+};
