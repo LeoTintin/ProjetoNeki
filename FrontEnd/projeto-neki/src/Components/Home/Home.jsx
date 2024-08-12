@@ -12,32 +12,42 @@ export const Home = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [userId, setUserId] = useState(null);
 
+  // Função auxiliar para obter o token
+  const getToken = () => localStorage.getItem("token");
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     console.log("Token:", token); // Verifique se o token está presente
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
         console.log("Decoded Token:", decodedToken); // Verifique a estrutura do token
 
-        // Ajuste conforme necessário
         const idFromToken = decodedToken.id || decodedToken.userId;
         if (idFromToken) {
           setUserId(idFromToken);
 
           // Carregar as skills do usuário
-          fetch(`http://localhost:8080/usuarios/skills/${idFromToken}`)
+          fetch(`http://localhost:8080/usuarios/skills/${idFromToken}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
             .then((response) => response.json())
             .then((data) => {
               setSkills(data);
-              console.log (data);
+              console.log(data);
             })
             .catch((error) =>
               console.error("Erro ao carregar skills do usuário:", error)
             );
 
           // Carregar as habilidades disponíveis para adicionar
-          fetch("http://localhost:8080/skills")
+          fetch("http://localhost:8080/skills", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
             .then((response) => response.json())
             .then((data) => setAvailableSkills(data))
             .catch((error) =>
@@ -72,7 +82,7 @@ export const Home = () => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${getToken()}`,
       },
       body: JSON.stringify({ level }),
     })
@@ -98,7 +108,7 @@ export const Home = () => {
     fetch(`http://localhost:8080/usuarios/skills/${userId}/${id}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     })
       .then(() => {
@@ -112,12 +122,11 @@ export const Home = () => {
   };
 
   const handleSaveSkill = () => {
-    const token = localStorage.getItem("token");
     fetch("http://localhost:8080/usuarios/skills", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${getToken()}`,
       },
       body: JSON.stringify({
         usuarioId: userId,
