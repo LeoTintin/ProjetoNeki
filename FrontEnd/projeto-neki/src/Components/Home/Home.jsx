@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Home = () => {
   const [skills, setSkills] = useState([]);
   const [availableSkills, setAvailableSkills] = useState([]); // Habilidades disponíveis para adicionar
   const [showModal, setShowModal] = useState(false);
+  const [openModal, setOpenModal] = useState (false);
   const [showLevelModal, setShowLevelModal] = useState(false);
   const [editingSkillId, setEditingSkillId] = useState(null);
   const [selectedSkill, setSelectedSkill] = useState(null);
@@ -68,10 +70,10 @@ export const Home = () => {
 
   const handleImageClick = (skill) => {
     setSelectedSkill(skill);
-    setShowModal(true);
+    setOpenModal(true);
   };
 
-  const handleLevelClick = (id, currentLevel) => {
+  const handleLevelClick = (id, currentLevel) => {  
     setEditingSkillId(id);
     setNewLevel(currentLevel);
     setShowLevelModal(true);
@@ -178,7 +180,7 @@ export const Home = () => {
         <button className="button2" onClick={handleAddSkill}>
           Adicionar Skill
         </button>
-
+       
         {showModal && (
           <div className="modal">
             <div className="modal-content">
@@ -254,6 +256,10 @@ export const Home = () => {
             Log-Out
           </a>
         </button>
+
+        <div className="register-link">
+          <p>Deseja criar uma conta? <Link to="/cadastro">Cadastre-se</Link></p>
+        </div>
       </div>
     </div>
   );

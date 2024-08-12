@@ -122,9 +122,7 @@ export const LoginForm = () => {
           </label>
         </div>
         <button className='button' type='submit'>ENTRAR</button>
-        <div className="register-link">
-          <p>Não possui conta? <Link to="/cadastro">Cadastre-se</Link></p>
-        </div>
+       
       </form>
 
       {showErrorModal && (
