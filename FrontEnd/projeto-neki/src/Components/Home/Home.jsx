@@ -1,42 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
 export const Home = () => {
-  const [skills, setSkills] = useState([
-    // {
-    //   id: 1,
-    //   imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg1MndL-Xp1JcnqaB0YOqTp6zDjrwYyGKsPA&s',
-    //   name: 'React',
-    //   level: 'Iniciante',
-    //   description: 'O React é uma biblioteca front-end JavaScript de código aberto com foco em criar interfaces de usuário em páginas web.',
-    // },
-    // {
-    //   id: 2,
-    //   imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/1200px-Unofficial_JavaScript_logo_2.svg.png',
-    //   name: 'Java',
-    //   level: 'Intermediário',
-    //   description: 'JavaScript é uma linguagem de programação interpretada estruturada, de script em alto nível com tipagem dinâmica fraca e multiparadigma',
-    // },
-    // {
-    //   id: 3,
-    //   imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUmnFYeOmmAlNV9_ZTu5cYgS2L55Q1pt9QyA&s',
-    //   name: 'Postgres',
-    //   level: 'Avançado',
-    //   description: 'PostgreSQL é um sistema gerenciador de banco de dados objeto relacional, desenvolvido como projeto de código aberto.',
-    // }
-    // // Adicione mais skills conforme necessário
-  ]);
-
+  const [skills, setSkills] = useState([]);
+  const [availableSkills, setAvailableSkills] = useState([]); // Habilidades disponíveis para adicionar
   const [showModal, setShowModal] = useState(false);
   const [showLevelModal, setShowLevelModal] = useState(false);
   const [editingSkillId, setEditingSkillId] = useState(null);
   const [selectedSkill, setSelectedSkill] = useState(null);
-  const [newLevel, setNewLevel] = useState('');
+  const [newLevel, setNewLevel] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    console.log("Token:", token); // Verifique se o token está presente
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log("Decoded Token:", decodedToken); // Verifique a estrutura do token
+
+        // Ajuste conforme necessário
+        const idFromToken = decodedToken.id || decodedToken.userId;
+        if (idFromToken) {
+          setUserId(idFromToken);
+
+          // Carregar as skills do usuário
+          fetch(`http://localhost:8080/usuarios/skills/${idFromToken}`)
+            .then((response) => response.json())
+            .then((data) => {
+              setSkills(data);
+              console.log (data);
+            })
+            .catch((error) =>
+              console.error("Erro ao carregar skills do usuário:", error)
+            );
+
+          // Carregar as habilidades disponíveis para adicionar
+          fetch("http://localhost:8080/skills")
+            .then((response) => response.json())
+            .then((data) => setAvailableSkills(data))
+            .catch((error) =>
+              console.error("Erro ao carregar habilidades disponíveis:", error)
+            );
+        } else {
+          console.error("ID do usuário não encontrado no token");
+        }
+      } catch (error) {
+        console.error("Erro ao decodificar o token:", error);
+      }
+    }
+  }, []);
 
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
   };
-
 
   const handleImageClick = (skill) => {
     setSelectedSkill(skill);
@@ -50,13 +68,25 @@ export const Home = () => {
   };
 
   const handleLevelChange = (level) => {
-    setSkills(
-      skills.map((skill) =>
-        skill.id === editingSkillId ? { ...skill, level: level } : skill
-      )
-    );
-    setShowLevelModal(false);
-    setEditingSkillId(null);
+    fetch(`http://localhost:8080/usuarios/skills/${userId}/${editingSkillId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ level }),
+    })
+      .then((response) => response.json())
+      .then((updatedSkill) => {
+        setSkills(
+          skills.map((skill) =>
+            skill.id === editingSkillId ? updatedSkill : skill
+          )
+        );
+        setShowLevelModal(false);
+        setEditingSkillId(null);
+      })
+      .catch((error) => console.error("Erro ao atualizar skill:", error));
   };
 
   const handleCloseModal = () => {
@@ -65,16 +95,42 @@ export const Home = () => {
   };
 
   const handleDeleteSkill = (id) => {
-    setSkills(skills.filter((skill) => skill.id !== id));
+    fetch(`http://localhost:8080/usuarios/skills/${userId}/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then(() => {
+        setSkills(skills.filter((skill) => skill.id !== id));
+      })
+      .catch((error) => console.error("Erro ao excluir skill:", error));
   };
 
   const handleAddSkill = () => {
     setShowModal(true);
   };
 
-  const handleSaveSkill = (newSkill) => {
-    setSkills([...skills, newSkill]);
-    setShowModal(false);
+  const handleSaveSkill = () => {
+    const token = localStorage.getItem("token");
+    fetch("http://localhost:8080/usuarios/skills", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        usuarioId: userId,
+        skillId: selectedOption,
+        level: "INICIANTE", // Você pode ajustar isso conforme a lógica desejada
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setSkills([...skills, data]);
+        setShowModal(false);
+      })
+      .catch((error) => console.error("Erro ao salvar skill:", error));
   };
 
   const handleCancel = () => {
@@ -89,35 +145,55 @@ export const Home = () => {
           {skills.map((skill) => (
             <div key={skill.id} className="skill">
               <img
-                src={skill.imageUrl}
-                alt={skill.name}
+                src={skill.imagemUrl}
+                alt={skill.nome}
                 onClick={() => handleImageClick(skill)}
-               />
-              <h2>{skill.name}</h2>
-              <button className='button2'  onClick={() => handleLevelClick(skill.id, skill.level)}>
-                Level: {skill.level}
+              />
+              <h2>{skill.nome}</h2>
+              <button
+                className="button2"
+                onClick={() => handleLevelClick(skill.id, skill.level)}
+              >
+                {skill.level}
               </button>
-              <button className='button2'  onClick={() => handleDeleteSkill(skill.id)}>
+              <button
+                className="button2"
+                onClick={() => handleDeleteSkill(skill.id)}
+              >
                 Excluir
               </button>
             </div>
           ))}
         </div>
 
-        <button className='button2'  onClick={handleAddSkill}>Adicionar Skill</button>
+        <button className="button2" onClick={handleAddSkill}>
+          Adicionar Skill
+        </button>
 
         {showModal && (
           <div className="modal">
             <div className="modal-content">
               <h1>Adicionar Skill</h1>
-              <select className='selection' value={selectedOption} onChange={handleOptionChange}>
-    <option value="" disabled>Escolha sua habilidade</option>
-    <option value="skill1">React</option>
-    <option value="skill2">Java</option>
-    <option value="skill3">Postgres</option>
-  </select>
-              <button className='button2'  onClick={handleSaveSkill}>Salvar</button>
-              <button className='button2'  onClick={handleCancel}>Cancelar</button>
+              <select
+                className="selection"
+                value={selectedOption}
+                onChange={handleOptionChange}
+              >
+                <option value="" disabled>
+                  Escolha sua habilidade
+                </option>
+                {availableSkills.map((skill) => (
+                  <option key={skill.id} value={skill.id}>
+                    {skill.nome}
+                  </option>
+                ))}
+              </select>
+              <button className="button2" onClick={handleSaveSkill}>
+                Salvar
+              </button>
+              <button className="button2" onClick={handleCancel}>
+                Cancelar
+              </button>
             </div>
           </div>
         )}
@@ -125,9 +201,9 @@ export const Home = () => {
         {selectedSkill && (
           <div className="modal">
             <div className="modal-content">
-              <h2>{selectedSkill.name}</h2>
-              <p>{selectedSkill.description}</p>
-              <button onClick={handleCloseModal}>Fechar</button>
+              <h2>{selectedSkill.nome}</h2>
+              <p>{selectedSkill.descricao}</p>
+              <button className="button2" onClick={handleCloseModal}>Fechar</button>
             </div>
           </div>
         )}
@@ -136,16 +212,38 @@ export const Home = () => {
           <div className="modal">
             <div className="modal-content">
               <h2>Editar Nível</h2>
-              <button className='button2' onClick={() => handleLevelChange('Iniciante')}>Iniciante</button>
-              <button className='button2'  onClick={() => handleLevelChange('Intermediário')}>Intermediário</button>
-              <button className='button2'  onClick={() => handleLevelChange('Avançado')}>Avançado</button>
-              <button className='button2'  onClick={() => setShowLevelModal(false)}>Cancelar</button>
+              <button
+                className="button2"
+                onClick={() => handleLevelChange("INICIANTE")}
+              >
+                Iniciante
+              </button>
+              <button
+                className="button2"
+                onClick={() => handleLevelChange("INTERMEDIARIO")}
+              >
+                Intermediário
+              </button>
+              <button
+                className="button2"
+                onClick={() => handleLevelChange("AVANCADO")}
+              >
+                Avançado
+              </button>
+              <button
+                className="button2"
+                onClick={() => setShowLevelModal(false)}
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         )}
 
-        <button className='button'>
-          <a href="/login" className="Link">Log-Out</a>
+        <button className="button">
+          <a href="/login" className="Link">
+            Log-Out
+          </a>
         </button>
       </div>
     </div>
